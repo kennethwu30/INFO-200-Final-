@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyPlan - My Routes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f9fafb;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: #4c1d95;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-logo {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            height: calc(100vh - 110px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 70px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            overflow-y: auto;
+        }
+
+        .sidebar button:hover {
+            opacity: 0.8;
+        }
+
+        .sidebar button:active {
+            transform: scale(0.95);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .content-header {
+            padding: 2rem 2rem 1rem 2rem;
+        }
+
+        .content-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .content-subtitle {
+            font-size: 1.125rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .content-description {
+            font-size: 0.875rem;
+            color: #4b5563;
+            line-height: 1.6;
+            max-width: 800px;
+        }
+
+        /* Routes Layout */
+        .routes-container {
+            display: grid;
+            grid-template-columns: 240px 1fr 300px;
+            height: calc(100vh - 320px);
+            border-top: 1px solid #e5e7eb;
+            margin-top: 1.5rem;
+        }
+
+        /* Schedule Panel */
+        .schedule-panel {
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .schedule-day {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+        }
+
+        .schedule-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-time {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Map Panel */
+        .map-panel {
+            background: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .day-selector {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .day-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 0.25rem;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .day-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .day-btn.active {
+            background: #4b5563;
+            color: white;
+            border-color: #4b5563;
+        }
+
+        .map-container {
+            flex: 1;
+            background: #d1d5db;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+
+        /* Course List Panel */
+        .course-list-panel {
+            background: white;
+            border-left: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .course-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .course-list-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .course-list-badge {
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .course-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .course-item:hover {
+            border-color: #6b21a8;
+            box-shadow: 0 2px 8px rgba(107, 33, 168, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .course-code {
+            font-weight: 600;
+            color: #2563eb;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .course-name {
+            font-size: 0.813rem;
+            color: #2563eb;
+            margin-bottom: 0.25rem;
+        }
+
+        .course-details {
+            font-size: 0.75rem;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-action-link {
+            font-size: 0.75rem;
+            color: #2563eb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .course-action-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1200px) {
+            .routes-container {
+                grid-template-columns: 220px 1fr 260px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .routes-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .schedule-panel,
+            .course-list-panel {
+                border: none;
+                border-top: 1px solid #e5e7eb;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="header-logo">MyUW   UW.edu</div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <span>👤</span>
+                <span>Kenneth Wu</span>
+            </div>
+            <button style="background: none; border: none; color: white; cursor: pointer; font-size: 0.875rem;">Sign Out</button>
+        </div>
+    </div>
+
+    <!-- MyPlan Bar -->
+    <div style="background: #5b21b6; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <button style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0;">☰</button>
+            <h1 style="color: white; font-size: 1.75rem; font-weight: 600; margin: 0;">MyPlan</h1>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <button style="background: none; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;">Planning</button>
+            <button style="background: none; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;">WI 26</button>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div style="padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 2rem; align-items: center;">
+                <button id="btn-find-courses" onclick="showPage('find-courses')" style="background: none; border: none; color: #6b7280; font-size: 1.5rem; cursor: pointer; width: 48px; height: 48px; border-radius: 0.5rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                    🔍
+                </button>
+                <button id="btn-my-routes" onclick="showPage('my-routes')" style="background: #ede9fe; border: 2px solid #a855f7; color: #1f2937; font-size: 1.5rem; cursor: pointer; width: 48px; height: 48px; border-radius: 0.5rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                    🧭
+                </button>
+                <button id="btn-notifications" onclick="showPage('notifications')" style="background: none; border: none; color: #6b7280; font-size: 1.5rem; cursor: pointer; width: 48px; height: 48px; border-radius: 0.5rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                    ✉️
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- My Routes Page -->
+            <div id="page-my-routes">
+            <div class="content-header">
+                <h1 class="content-title">My Routes</h1>
+                <h2 class="content-subtitle">Winter 2026</h2>
+                <p class="content-description">
+                    My Routes maps out the route between each of your classes based on the day of the week. 
+                    Review routes and view building accessibility information. If you have questions, visit 
+                    MyPlan for more info.
+                </p>
+            </div>
+
+            <!-- Routes Container -->
+            <div class="routes-container">
+                <!-- Schedule Panel (Left) -->
+                <div class="schedule-panel">
+                    <div class="schedule-day" id="schedule-day-title">Monday</div>
+                    <div id="schedule-content">
+                        <div class="schedule-item">
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">10:30 - 11:20</div>
+                            <div style="font-size: 0.95rem; color: #1f2937; font-weight: 500;">INFO 290 • MGH</div>
+                        </div>
+                        <div class="schedule-item" style="background: #fef3c7; padding: 0.75rem; border-radius: 0.375rem; border-left: 3px solid #f59e0b;">
+                            <div style="font-size: 0.813rem; color: #92400e; font-weight: 500;">🚶 Walking</div>
+                            <div style="font-size: 0.813rem; color: #78350f;">MGH → Bagley • ~5 min</div>
+                        </div>
+                        <div class="schedule-item">
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">1:30 - 2:20</div>
+                            <div style="font-size: 0.95rem; color: #1f2937; font-weight: 500;">INFO 330 • Bagley</div>
+                        </div>
+                        <div class="schedule-item" style="background: #fef3c7; padding: 0.75rem; border-radius: 0.375rem; border-left: 3px solid #f59e0b;">
+                            <div style="font-size: 0.813rem; color: #92400e; font-weight: 500;">🚶 Walking</div>
+                            <div style="font-size: 0.813rem; color: #78350f;">Bagley → NANO • ~8 min</div>
+                        </div>
+                        <div class="schedule-item">
+                            <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">3:30 - 4:20</div>
+                            <div style="font-size: 0.95rem; color: #1f2937; font-weight: 500;">INFO 200 • NANO</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Panel (Center) -->
+                <div class="map-panel">
+                    <!-- Day Selector -->
+                    <div class="day-selector">
+                        <button class="day-btn active" onclick="selectDay('M')">M</button>
+                        <button class="day-btn" onclick="selectDay('T')">T</button>
+                        <button class="day-btn" onclick="selectDay('W')">W</button>
+                        <button class="day-btn" onclick="selectDay('Th')">Th</button>
+                        <button class="day-btn" onclick="selectDay('F')">F</button>
+                    </div>
+
+                    <!-- Map SVG -->
+                    <div class="map-container">
+                        <svg viewBox="0 0 800 600" style="width: 100%; height: 100%;">
+                            <!-- Background -->
+                            <rect width="800" height="600" fill="#b4d8b4"/>
+                            
+                            <!-- Campus paths/walkways (white) -->
+                            <path d="M 0 180 L 800 180" stroke="white" stroke-width="18" fill="none"/>
+                            <path d="M 0 300 L 800 300" stroke="white" stroke-width="18" fill="none"/>
+                            <path d="M 0 420 L 800 420" stroke="white" stroke-width="18" fill="none"/>
+                            <path d="M 180 0 L 180 600" stroke="white" stroke-width="18" fill="none"/>
+                            <path d="M 380 0 L 380 600" stroke="white" stroke-width="18" fill="none"/>
+                            <path d="M 580 0 L 580 600" stroke="white" stroke-width="18" fill="none"/>
+                            
+                            <!-- Additional smaller paths -->
+                            <path d="M 280 100 L 280 500" stroke="white" stroke-width="12" fill="none"/>
+                            <path d="M 480 100 L 480 500" stroke="white" stroke-width="12" fill="none"/>
+                            <path d="M 100 240 L 700 240" stroke="white" stroke-width="12" fill="none"/>
+                            <path d="M 100 360 L 700 360" stroke="white" stroke-width="12" fill="none"/>
+
+                            <!-- Buildings (black rectangles with labels) -->
+                            <!-- Top row -->
+                            <rect x="60" y="60" width="100" height="100" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="110" y="115" fill="white" font-size="10" text-anchor="middle" font-weight="bold">MEANY</text>
+                            
+                            <rect x="200" y="60" width="120" height="100" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="260" y="115" fill="white" font-size="10" text-anchor="middle" font-weight="bold">MGH</text>
+                            
+                            <rect x="400" y="60" width="100" height="100" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="450" y="115" fill="white" font-size="10" text-anchor="middle" font-weight="bold">ALLEN</text>
+                            
+                            <rect x="620" y="60" width="120" height="100" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="680" y="115" fill="white" font-size="10" text-anchor="middle" font-weight="bold">HUB</text>
+
+                            <!-- Middle row -->
+                            <rect x="60" y="210" width="100" height="70" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="110" y="250" fill="white" font-size="10" text-anchor="middle" font-weight="bold">KANE</text>
+                            
+                            <rect x="340" y="210" width="140" height="70" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="410" y="250" fill="white" font-size="10" text-anchor="middle" font-weight="bold">MARY GATES</text>
+                            
+                            <rect x="540" y="210" width="100" height="70" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="590" y="250" fill="white" font-size="10" text-anchor="middle" font-weight="bold">DENNY</text>
+
+                            <!-- Lower middle -->
+                            <rect x="60" y="330" width="100" height="70" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="110" y="370" fill="white" font-size="10" text-anchor="middle" font-weight="bold">PHYSICS</text>
+                            
+                            <rect x="240" y="330" width="120" height="90" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="300" y="380" fill="white" font-size="10" text-anchor="middle" font-weight="bold">BAGLEY</text>
+                            
+                            <rect x="440" y="330" width="100" height="70" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="490" y="370" fill="white" font-size="10" text-anchor="middle" font-weight="bold">RAITT</text>
+
+                            <!-- Bottom row -->
+                            <rect x="60" y="450" width="100" height="80" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="110" y="495" fill="white" font-size="10" text-anchor="middle" font-weight="bold">TOWER</text>
+                            
+                            <rect x="440" y="450" width="140" height="80" fill="#2d2d2d" stroke="white" stroke-width="2"/>
+                            <text x="510" y="495" fill="white" font-size="10" text-anchor="middle" font-weight="bold">NANO</text>
+
+                            <!-- Route paths (pink and blue) -->
+                            <defs>
+                                <marker id="arrowPink" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                                    <path d="M0,0 L0,12 L12,6 z" fill="#ec4899"/>
+                                </marker>
+                                <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                                    <path d="M0,0 L0,12 L12,6 z" fill="#3b82f6"/>
+                                </marker>
+                            </defs>
+                            
+                            <!-- Monday/Wednesday Routes -->
+                            <g id="routes-mwf">
+                                <!-- Pink route: MGH to Bagley -->
+                                <path d="M 260 160 Q 280 240 300 330" 
+                                      stroke="#ec4899" 
+                                      stroke-width="6" 
+                                      fill="none" 
+                                      marker-end="url(#arrowPink)"/>
+                                
+                                <!-- Blue route: Bagley to NANO -->
+                                <path d="M 360 380 Q 400 420 510 490" 
+                                      stroke="#3b82f6" 
+                                      stroke-width="6" 
+                                      fill="none" 
+                                      marker-end="url(#arrowBlue)"/>
+                            </g>
+
+                            <!-- Tuesday/Thursday Routes -->
+                            <g id="routes-tth" style="display: none;">
+                                <!-- Single route: Denny to Raitt -->
+                                <path d="M 640 245 Q 580 280 540 330" 
+                                      stroke="#ec4899" 
+                                      stroke-width="6" 
+                                      fill="none" 
+                                      marker-end="url(#arrowPink)"/>
+                            </g>
+
+                            <!-- Green spaces/lawns -->
+                            <ellipse cx="650" cy="350" rx="40" ry="35" fill="#8db88d" opacity="0.6"/>
+                            <ellipse cx="150" cy="540" rx="35" ry="30" fill="#8db88d" opacity="0.6"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Course List Panel (Right) -->
+                <div class="course-list-panel">
+                    <div class="course-list-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div class="course-list-title">Winter 2026</div>
+                            <button style="background: #93c5fd; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">i</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <div class="course-list-badge" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <span>REGISTERED</span>
+                            <button style="background: none; border: none; color: #1e40af; cursor: pointer; font-size: 0.75rem;">ⓘ</button>
+                        </div>
+                        <a class="course-action-link" style="float: right;">Drop courses ↗</a>
+                    </div>
+
+                    <!-- Courses -->
+                    <div class="course-item" onclick="showBuildingModal('INFO 290', 'MGH')" style="cursor: pointer;">
+                        <div class="course-code">INFO 290</div>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.25rem;">1 CR</div>
+                        <div class="course-name">Orientation to Informatics</div>
+                        <div class="course-details">M+W 10:30 - 11:20</div>
+                    </div>
+
+                    <div class="course-item" onclick="showBuildingModal('INFO 330', 'Bagley')" style="cursor: pointer;">
+                        <div class="course-code">INFO 330</div>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.25rem;">5 CR</div>
+                        <div class="course-name">Databases and Data Modeling</div>
+                        <div class="course-details">M+W 1:30 - 2:20</div>
+                    </div>
+
+                    <div class="course-item" onclick="showBuildingModal('INFO 200', 'NANO')" style="cursor: pointer;">
+                        <div class="course-code">INFO 200</div>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.25rem;">5 CR</div>
+                        <div class="course-name">Intellectual Foundations</div>
+                        <div class="course-details">M+W 3:30 - 4:20</div>
+                    </div>
+
+                    <div class="course-item" onclick="showBuildingModal('INFO 340', 'Denny')" style="cursor: pointer;">
+                        <div class="course-code">INFO 340</div>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.25rem;">5 CR</div>
+                        <div class="course-name">Client-Side Development</div>
+                        <div class="course-details">T+Th 10:30 - 11:20</div>
+                    </div>
+
+                    <div class="course-item" onclick="showBuildingModal('INFO 380', 'Raitt')" style="cursor: pointer;">
+                        <div class="course-code">INFO 380</div>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.25rem;">5 CR</div>
+                        <div class="course-name">Product and Information Systems ...</div>
+                        <div class="course-details">T+Th 3:30 - 5:10</div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <!-- End My Routes Page -->
+
+            <!-- Find Courses Page -->
+            <div id="page-find-courses" style="display: none;">
+                <div style="background: #f9fafb; padding: 0.75rem 2rem; border-bottom: 1px solid #e5e7eb;">
+                    <a onclick="showPage('my-routes')" style="color: #6b7280; text-decoration: none; cursor: pointer; font-size: 0.875rem;">
+                        ← Back to My Routes
+                    </a>
+                </div>
+                <div class="content-header">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+                        <h1 class="content-title">Find Courses</h1>
+                        <a href="#" style="color: #6b7280; font-size: 0.875rem; text-decoration: none;">Related: View Bookmarks</a>
+                    </div>
+
+                    <!-- Campus Selection -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <span style="font-weight: 600; margin-right: 1rem;">SEATTLE CAMPUS</span>
+                        <a href="#" style="color: #2563eb; font-size: 0.875rem;">Change Campus</a>
+                    </div>
+
+                    <!-- Search Type -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 500; margin-bottom: 0.5rem; display: block;">Search in:</label>
+                        <div style="display: flex; gap: 1.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="search-type" value="time" checked>
+                                <span>Time Schedule</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="search-type" value="catalog">
+                                <span>Course Catalog</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Course Search -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 500; margin-bottom: 0.5rem; display: block;">Course search by:</label>
+                        <input type="text" 
+                               placeholder="e.g. Math 124, ENGL 1xx, COM, 2 credits, A&H, fiction" 
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.25rem; font-size: 0.875rem;">
+                        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem; font-style: italic;">
+                            Try: course code; course level (1xx); curriculum code; number of credits; instructor's last name; Gen Ed code; or keyword.
+                        </p>
+                    </div>
+
+                    <!-- Meeting Days and Times -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 500; margin-bottom: 0.5rem; display: block;">Meeting days and times:</label>
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Mon
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Tue
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Wed
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Thu
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Fri
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Sat
+                            </label>
+                            <div style="flex: 1; min-width: 200px;">
+                                <input type="range" min="0" max="24" value="6" style="width: 100%;">
+                                <div style="font-size: 0.875rem; color: #6b7280; text-align: center;">6:30 am — 10:30 pm</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exclude Options -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 500; margin-bottom: 0.5rem; display: block;">Exclude options:</label>
+                        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Has prerequisites
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Closed sections
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Unscheduled (TBA) sections
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Faculty/Add codes required
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Accessibility Filters - HIGHLIGHTED -->
+                    <div style="background: #fef3c7; border: 2px solid #fbbf24; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; margin-bottom: 0.75rem; display: block; color: #92400e;">Accessibility filters:</label>
+                        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Elevator Access
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Stair-Free Routes
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> ADA Restrooms
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox"> Automatic Doors
+                            </label>
+                        </div>
+                    </div>
+
+                    <button style="background: #d97706; color: white; padding: 0.75rem 2rem; border: none; border-radius: 0.25rem; font-weight: 600; cursor: pointer;">
+                        Search
+                    </button>
+                </div>
+            </div>
+            <!-- End Find Courses Page -->
+
+            <!-- Notifications Page -->
+            <div id="page-notifications" style="display: none;">
+                <div style="background: #f9fafb; padding: 0.75rem 2rem; border-bottom: 1px solid #e5e7eb;">
+                    <a onclick="showPage('my-routes')" style="color: #6b7280; text-decoration: none; cursor: pointer; font-size: 0.875rem;">
+                        ← Back to My Routes
+                    </a>
+                </div>
+                <div class="content-header">
+                    <h1 class="content-title">Access.UW Notifications</h1>
+                    <p class="content-description" style="margin-bottom: 2rem;">
+                        Real-time text notifications alert students about accessibility issues on campus, following conventions established by Notify.UW.
+                    </p>
+
+                    <!-- Phone Mockups -->
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; max-width: 900px; margin: 0 auto;">
+                        <!-- Phone 1: Lock Screen -->
+                        <div style="display: flex; flex-direction: column;">
+                            <h3 style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem; text-align: center;">Phone 1</h3>
+                            <div style="background: linear-gradient(135deg, #7c2d12 0%, #dc2626 30%, #f97316 50%, #ec4899 70%, #3b82f6 100%); border-radius: 2rem; padding: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 320px; margin: 0 auto; height: 600px; display: flex; flex-direction: column;">
+                                <!-- Status Bar -->
+                                <div style="display: flex; justify-content: space-between; align-items: center; color: white; font-size: 0.75rem; margin-bottom: 2rem;">
+                                    <div style="width: 80px; height: 20px; background: black; border-radius: 10px;"></div>
+                                    <div>📶 📡 🔋</div>
+                                </div>
+
+                                <!-- Time -->
+                                <div style="text-align: center; color: white; margin-bottom: 3rem;">
+                                    <div style="font-size: 0.875rem; margin-bottom: 0.5rem;">Sunday, March 10</div>
+                                    <div style="font-size: 3.5rem; font-weight: 200; letter-spacing: -2px;">1:47</div>
+                                </div>
+
+                                <!-- Lock Screen Notification -->
+                                <div style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 0.75rem; padding: 0.875rem; margin-bottom: 3rem;">
+                                    <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <div style="width: 20px; height: 20px; background: #10b981; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">💬</div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.813rem; color: #1f2937;">MESSAGES</div>
+                                            <div style="font-size: 0.75rem; color: #6b7280;">1m ago</div>
+                                        </div>
+                                    </div>
+                                    <div style="font-weight: 600; font-size: 0.875rem; color: #1f2937; margin-bottom: 0.25rem;">Access.UW</div>
+                                    <div style="font-size: 0.875rem; color: #4b5563;">Elevator #57 broken in Kane Hall. Click to view</div>
+                                </div>
+
+                                <!-- Spacer -->
+                                <div style="flex: 1;"></div>
+
+                                <!-- Bottom Icons -->
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 2rem;">
+                                    <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🔦</div>
+                                    <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📷</div>
+                                </div>
+
+                                <!-- Home Indicator -->
+                                <div style="width: 120px; height: 4px; background: rgba(255,255,255,0.5); border-radius: 2px; margin: 1.5rem auto 0.5rem;"></div>
+                            </div>
+                            
+                            <p style="font-size: 0.875rem; color: #6b7280; text-align: center; margin-top: 1.5rem; font-style: italic;">
+                                Text notification comes up on phone lock screen.
+                            </p>
+                        </div>
+
+                        <!-- Phone 2: Message Thread -->
+                        <div style="display: flex; flex-direction: column;">
+                            <h3 style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem; text-align: center;">Phone 2</h3>
+                            <div style="background: #f3f4f6; border-radius: 2rem; padding: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 320px; margin: 0 auto; height: 600px; display: flex; flex-direction: column;">
+                                <!-- Messages Header -->
+                                <div style="background: white; border-radius: 1rem 1rem 0 0; padding: 1rem; margin-bottom: 0;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                                        <div style="color: #2563eb; font-size: 1.25rem; cursor: pointer;">←</div>
+                                        <div style="width: 40px; height: 40px; background: #d1d5db; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #6b7280;">A</div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; color: #1f2937;">Access.UW</div>
+                                        </div>
+                                        <div style="background: #2563eb; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600;">99</div>
+                                    </div>
+                                </div>
+
+                                <!-- Message Thread -->
+                                <div style="background: white; padding: 1rem; flex: 1; overflow-y: auto;">
+                                    <!-- Message 1 -->
+                                    <div style="margin-bottom: 1.5rem;">
+                                        <div style="text-align: center; font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.75rem;">9:55 AM</div>
+                                        <div style="background: #e5e7eb; border-radius: 1rem; padding: 0.875rem; max-width: 80%;">
+                                            <div style="font-size: 0.875rem; color: #1f2937;">
+                                                Elevator #57 broken in Kane Hall. <span style="text-decoration: underline; color: #2563eb;">Click to view</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Message 2 -->
+                                    <div style="margin-bottom: 1.5rem;">
+                                        <div style="text-align: center; font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.75rem;">5:03 PM</div>
+                                        <div style="background: #e5e7eb; border-radius: 1rem; padding: 0.875rem; max-width: 80%;">
+                                            <div style="font-size: 0.875rem; color: #1f2937;">
+                                                Update: Elevator repaired as of 5:03 PM. Return to use as normal.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Message Input Bar -->
+                                <div style="background: white; border-radius: 0 0 1rem 1rem; padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="color: #6b7280; font-size: 1.25rem;">📷</div>
+                                    <div style="color: #6b7280; font-size: 1.25rem;">🎮</div>
+                                    <div style="flex: 1; background: #f3f4f6; border-radius: 1rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; color: #9ca3af;">
+                                        iMessage
+                                    </div>
+                                </div>
+
+                                <!-- Home Indicator -->
+                                <div style="width: 120px; height: 4px; background: #1f2937; border-radius: 2px; margin: 0.75rem auto 0.25rem;"></div>
+                            </div>
+
+                            <p style="font-size: 0.875rem; color: #6b7280; text-align: center; margin-top: 1.5rem; font-style: italic;">
+                                Links in texts lead to UW accessibility map.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.5rem; padding: 1.5rem; margin-top: 3rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+                        <p style="font-size: 0.875rem; color: #1e40af; line-height: 1.6;">
+                            <strong>Note:</strong> Text notifications come up on phone lock screen. Links in the texts can be clicked to lead to the corresponding point on the existing UW accessibility map. This follows conventions established by Notify.UW.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- End Notifications Page -->
+        </div>
+    </div>
+
+    <!-- Building Detail Modal -->
+    <div id="building-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 2rem;">
+        <div style="background: white; border-radius: 0.5rem; max-width: 1000px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
+            <button onclick="closeBuildingModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 2rem; color: #6b7280; cursor: pointer; z-index: 10;">×</button>
+            
+            <div id="building-modal-content">
+                <!-- Content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page switching
+        function showPage(pageName) {
+            // Hide all pages
+            document.getElementById('page-my-routes').style.display = 'none';
+            document.getElementById('page-find-courses').style.display = 'none';
+            document.getElementById('page-notifications').style.display = 'none';
+            
+            // Reset all button styles
+            const buttons = ['btn-find-courses', 'btn-my-routes', 'btn-notifications'];
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                btn.style.background = 'none';
+                btn.style.border = 'none';
+                btn.style.color = '#6b7280';
+            });
+            
+            // Show selected page and highlight button
+            if (pageName === 'my-routes') {
+                document.getElementById('page-my-routes').style.display = 'block';
+                const btn = document.getElementById('btn-my-routes');
+                btn.style.background = '#ede9fe';
+                btn.style.border = '2px solid #a855f7';
+                btn.style.color = '#1f2937';
+            } else if (pageName === 'find-courses') {
+                document.getElementById('page-find-courses').style.display = 'block';
+                const btn = document.getElementById('btn-find-courses');
+                btn.style.background = '#ede9fe';
+                btn.style.border = '2px solid #a855f7';
+                btn.style.color = '#1f2937';
+            } else if (pageName === 'notifications') {
+                document.getElementById('page-notifications').style.display = 'block';
+                const btn = document.getElementById('btn-notifications');
+                btn.style.background = '#ede9fe';
+                btn.style.border = '2px solid #a855f7';
+                btn.style.color = '#1f2937';
+            }
+        }
+
+        // Building modal
+        function showBuildingModal(courseCode, buildingName) {
+            const modal = document.getElementById('building-modal');
+            const modalContent = document.getElementById('building-modal-content');
+            
+            // Building data
+            const buildings = {
+                'MGH': {
+                    name: 'Mary Gates Hall (MGH)',
+                    elevators: '#49 (serves all floors)',
+                    restrooms: 'Men: Floor 2<br>Women: Floor 3'
+                },
+                'Bagley': {
+                    name: 'Bagley Hall',
+                    elevators: '#52 (serves all floors)',
+                    restrooms: 'Men: Floor 1<br>Women: Floor 2'
+                },
+                'Denny': {
+                    name: 'Denny Hall',
+                    elevators: '#23 (serves all floors)',
+                    restrooms: 'Nearest: Kane Hall'
+                },
+                'Raitt': {
+                    name: 'Raitt Hall',
+                    elevators: '#37 (serves all floors)',
+                    restrooms: 'Men: Floor 1<br>Women: Floor 1'
+                }
+            };
+            
+            const building = buildings[buildingName] || buildings['MGH'];
+            
+            modalContent.innerHTML = `
+                <div style="padding: 2rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 1.5rem;">
+                        ${courseCode}
+                    </h2>
+                    
+                    <!-- Building Map -->
+                    <div style="background: #f3f4f6; border-radius: 0.5rem; padding: 2rem; margin-bottom: 2rem;">
+                        <svg viewBox="0 0 600 400" style="width: 100%; background: #b4d8b4; border-radius: 0.375rem;">
+                            <!-- Building outline -->
+                            <rect x="50" y="50" width="500" height="300" fill="#2d2d2d" stroke="white" stroke-width="3"/>
+                            
+                            <!-- Main corridor (horizontal) -->
+                            <line x1="50" y1="200" x2="550" y2="200" stroke="white" stroke-width="20"/>
+                            
+                            <!-- Cross corridor (vertical) -->
+                            <line x1="300" y1="50" x2="300" y2="350" stroke="white" stroke-width="20"/>
+                            
+                            <!-- Entrance markers (purple circles with arrows) -->
+                            <circle cx="50" cy="200" r="15" fill="#6b21a8"/>
+                            <text x="50" y="205" fill="white" font-size="16" text-anchor="middle" font-weight="bold">→</text>
+                            
+                            <circle cx="300" cy="50" r="15" fill="#6b21a8"/>
+                            <text x="300" y="55" fill="white" font-size="16" text-anchor="middle" font-weight="bold">↓</text>
+                            
+                            <circle cx="550" cy="200" r="15" fill="#6b21a8"/>
+                            <text x="550" y="205" fill="white" font-size="16" text-anchor="middle" font-weight="bold">→</text>
+                            
+                            <!-- Elevator icon (center) -->
+                            <rect x="285" y="185" width="30" height="30" fill="white" rx="3"/>
+                            <rect x="290" y="190" width="20" height="20" fill="#6b21a8"/>
+                            
+                            <!-- Accessible entrance icon -->
+                            <circle cx="300" cy="350" r="12" fill="white"/>
+                            <path d="M 295 350 L 305 350" stroke="#6b21a8" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Building Info Card -->
+                    <div style="background: white; border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h3 style="font-weight: 600; font-size: 1.125rem; color: #1f2937; margin-bottom: 1rem;">
+                            ${building.name}
+                        </h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div>
+                                <div style="font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">Elevators</div>
+                                <div style="color: #6b7280;">${building.elevators}</div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">Restrooms</div>
+                                <div style="color: #6b7280;">${building.restrooms}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeBuildingModal() {
+            document.getElementById('building-modal').style.display = 'none';
+        }
+        
+        // Close modal on background click
+        document.getElementById('building-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBuildingModal();
+            }
+        });
+
+        // Day selection functionality
+        function selectDay(day) {
+            // Update active button
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update schedule title
+            const dayNames = {
+                'M': 'Monday',
+                'T': 'Tuesday',
+                'W': 'Wednesday',
+                'Th': 'Thursday',
+                'F': 'Friday'
+            };
+            document.getElementById('schedule-day-title').textContent = dayNames[day];
+
+            // Update map routes visibility
+            const routesMWF = document.getElementById('routes-mwf');
+            const routesTTh = document.getElementById('routes-tth');
+
+            // Update schedule content based on day
+            const scheduleContent = document.getElementById('schedule-content');
+            
+            if (day === 'M' || day === 'W') {
+                // Show M/W/F routes
+                routesMWF.style.display = 'block';
+                routesTTh.style.display = 'none';
+                
+                scheduleContent.innerHTML = `
+                    <div class="schedule-item">
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">10:30 - 11:20</div>
+                        <div style="font-size: 0.95rem; color: #1f2937; font-weight: 500;">INFO 290 • MGH</div>
+                    </div>
+                    <div class="schedule-item" style="background: #fef3c7; padding: 0.75rem; border-radius: 0.375rem; border-left: 3px solid #f59e0b;">
+                        <div style="font-size: 0.813rem; color: #92400e; font-weight: 500;">🚶 Walking</div>
+                        <div style="font-size: 0.813rem; color: #78350f;">MGH → Bagley • ~5 min</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">1:30 - 2:20</div>
+                        <div style="font-size: 0.95rem; color: #1f2937; font-weight: 500;">INFO 330 • Bagley</div>
+                    </div>
+                    <div class="schedule-item" style="background: #fef3c7; padding: 0.75rem; border-radius: 0.375rem; border-left: 3px solid #f59e0b;">
+                        <div style="font-size: 0.813rem; color: #92400e; font-weight: 500;">🚶 Walking</div>
+                        <div style="font-size: 0.813rem; color: #78350f;">Bagley → NANO • ~8 min</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">3:30 - 4:20</div>
+                        <div style="font-size: 0.95rem; color: #1f2937; font-weight: 500;">INFO 200 • NANO</div>
+                    </div>
+                `;
+            } else if (day === 'T' || day === 'Th') {
+                // Show T/Th routes
+                routesMWF.style.display = 'none';
+                routesTTh.style.display = 'block';
+                
+                scheduleContent.innerHTML = `
+                    <div class="schedule-item">
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">10:30 - 11:20</div>
+                        <div style="font-size: 0.95rem; color: #1f2937; font-weight: 500;">INFO 340 • Denny</div>
+                    </div>
+                    <div class="schedule-item" style="background: #fef3c7; padding: 0.75rem; border-radius: 0.375rem; border-left: 3px solid #f59e0b;">
+                        <div style="font-size: 0.813rem; color: #92400e; font-weight: 500;">🚶 Walking</div>
+                        <div style="font-size: 0.813rem; color: #78350f;">Denny → Raitt • ~6 min</div>
+                    </div>
+                    <div class="schedule-item">
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">3:30 - 5:10</div>
+                        <div style="font-size: 0.95rem; color: #1f2937; font-weight: 500;">INFO 380 • Raitt</div>
+                    </div>
+                `;
+            } else {
+                // Hide all routes for Friday
+                routesMWF.style.display = 'none';
+                routesTTh.style.display = 'none';
+                
+                scheduleContent.innerHTML = `
+                    <div class="schedule-item">
+                        <div style="text-align: center; color: #9ca3af; padding: 2rem 0;">
+                            No classes scheduled
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
